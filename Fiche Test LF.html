@@ -1,0 +1,643 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Fiche de tests - Jonglerie & Conduite de balle</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js" crossorigin="anonymous"></script>
+<style>
+  :root {
+    --bg: #f4f6f5;
+    --card: #ffffff;
+    --text: #1a2b22;
+    --muted: #5f6f66;
+    --accent: #2f7d4f;
+    --accent-dark: #245f3c;
+    --border: #dde3df;
+    --danger: #b5453a;
+    --chip: #eef3ef;
+    box-sizing: border-box;
+    padding-top: env(safe-area-inset-top, 0px);
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #141815;
+      --card: #1e241f;
+      --text: #eef1ee;
+      --muted: #9aa79f;
+      --accent: #4fae76;
+      --accent-dark: #6fc990;
+      --border: #303a32;
+      --chip: #263029;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #141815;
+    --card: #1e241f;
+    --text: #eef1ee;
+    --muted: #9aa79f;
+    --accent: #4fae76;
+    --accent-dark: #6fc990;
+    --border: #303a32;
+    --chip: #263029;
+  }
+  html { scroll-padding-top: env(safe-area-inset-top, 0px); }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+    padding: 20px 16px 60px;
+  }
+  .wrap { max-width: 880px; margin: 0 auto; }
+  h1 { font-size: 1.4rem; margin: 4px 0 2px; }
+  .sub { color: var(--muted); font-size: 0.9rem; margin-bottom: 20px; }
+  .card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 18px;
+    margin-bottom: 20px;
+  }
+  .card h2 { font-size: 1.05rem; margin: 0 0 14px; }
+  .card h3 { font-size: 0.92rem; margin: 0 0 10px; }
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 12px;
+  }
+  label { font-size: 0.8rem; color: var(--muted); display: block; margin-bottom: 4px; }
+  input, select, textarea {
+    width: 100%;
+    padding: 9px 10px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    background: var(--bg);
+    color: var(--text);
+    font-size: 0.95rem;
+    font-family: inherit;
+  }
+  textarea { resize: vertical; min-height: 90px; font-size: 0.78rem; }
+  button {
+    border: none;
+    border-radius: 8px;
+    padding: 10px 18px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+  }
+  .btn-primary { background: var(--accent); color: #fff; margin-top: 14px; }
+  .btn-primary:hover { background: var(--accent-dark); }
+  .btn-secondary { background: transparent; color: var(--accent); border: 1px solid var(--accent); }
+  .btn-danger { background: transparent; color: var(--danger); border: 1px solid var(--danger); padding: 4px 9px; font-size: 0.78rem; }
+  .btn-ghost { background: transparent; color: var(--muted); border: 1px solid var(--border); }
+  .toolbar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; gap: 10px; flex-wrap: wrap; }
+  .row-buttons { display: flex; gap: 8px; flex-wrap: wrap; }
+  table { width: 100%; border-collapse: collapse; font-size: 0.88rem; }
+  .table-scroll { overflow-x: auto; }
+  th, td { text-align: left; padding: 8px 10px; border-bottom: 1px solid var(--border); white-space: nowrap; }
+  th { color: var(--muted); font-weight: 600; font-size: 0.78rem; text-transform: uppercase; }
+  tr:last-child td { border-bottom: none; }
+  .empty { color: var(--muted); font-size: 0.9rem; padding: 10px 0; }
+  .count { font-size: 0.85rem; color: var(--muted); }
+  .active-banner {
+    display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;
+    background: var(--chip); border: 1px solid var(--border); border-radius: 10px; padding: 12px 14px; margin-bottom: 14px;
+  }
+  .active-banner .meta { font-size: 0.95rem; font-weight: 600; }
+  .active-banner .meta small { display: block; font-weight: 400; color: var(--muted); font-size: 0.78rem; margin-top: 2px; }
+  .chip-list { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 14px; }
+  .chip {
+    border: 1px solid var(--border); border-radius: 999px; padding: 6px 12px; font-size: 0.8rem;
+    background: var(--bg); cursor: pointer; color: var(--text);
+  }
+  .chip.active { background: var(--accent); color: #fff; border-color: var(--accent); }
+  .hint { font-size: 0.78rem; color: var(--muted); margin-top: 8px; }
+  .divider { border: none; border-top: 1px solid var(--border); margin: 16px 0; }
+  .tabs { display: flex; gap: 6px; margin-bottom: 14px; }
+  .tab-btn {
+    background: transparent; border: 1px solid var(--border); color: var(--muted);
+    padding: 7px 12px; border-radius: 8px; font-size: 0.82rem;
+  }
+  .tab-btn.active { background: var(--accent); color: #fff; border-color: var(--accent); }
+  .share-panel { display: none; margin-top: 12px; }
+  .share-panel.open { display: block; }
+  .copy-msg { font-size: 0.78rem; color: var(--accent); margin-left: 8px; }
+
+/* --- Mobile / smartphone improvements --- */
+html { -webkit-text-size-adjust: 100%; }
+body {
+  padding: max(12px, env(safe-area-inset-top)) 12px max(32px, env(safe-area-inset-bottom));
+  overflow-x: hidden;
+}
+button, input, select, textarea { -webkit-tap-highlight-color: transparent; }
+button, select, input[type="date"], input[type="number"] {
+  min-height: 44px;
+}
+button { touch-action: manipulation; }
+.table-scroll {
+  width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+@media (max-width: 600px) {
+  .wrap { max-width: none; width: 100%; }
+  h1 { font-size: 1.18rem; line-height: 1.3; }
+  .sub { font-size: 0.84rem; line-height: 1.4; }
+  .card { padding: 14px; border-radius: 12px; margin-bottom: 14px; }
+  .card h2 { font-size: 1rem; }
+  .grid { grid-template-columns: 1fr; gap: 10px; }
+  input, select, textarea { font-size: 16px; }
+  textarea { min-height: 120px; }
+  .row-buttons { width: 100%; }
+  .row-buttons button,
+  .row-buttons label {
+    flex: 1 1 100%;
+    min-height: 44px;
+    justify-content: center;
+    text-align: center;
+  }
+  .btn-primary { width: 100%; min-height: 46px; }
+  .tabs { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+  .tab-btn { flex: 1 0 auto; min-height: 44px; }
+  .chip-list { gap: 6px; }
+  .chip { padding: 9px 12px; min-height: 40px; display: inline-flex; align-items: center; }
+  th, td { padding: 10px 8px; }
+  .active-banner { align-items: flex-start; }
+}
+
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>⚽ Fiche de tests — Jonglerie & Conduite de balle</h1>
+  <p class="sub">Crée une session de test par groupe, saisis les résultats sur le terrain, puis exporte ou partage en un clic.</p>
+  <p class="hint" style="margin-top:-12px;">📱 Optimisée pour téléphone : ajoute cette page à ton écran d’accueil pour l’utiliser comme une petite application.</p>
+
+  <!-- SESSION -->
+  <div class="card">
+    <h2>Session de test</h2>
+    <div id="activeBanner"></div>
+
+    <div id="sessionChips"></div>
+
+    <hr class="divider">
+    <h3>Nouvelle session</h3>
+    <div class="grid">
+      <div>
+        <label>Groupe / catégorie</label>
+        <select id="s_categorie">
+          <option selected>U8</option>
+          <option>U13</option>
+          <option>Section sportive</option>
+          <option>Autre</option>
+        </select>
+      </div>
+      <div>
+        <label>Numéro de test (saison)</label>
+        <select id="s_testNum">
+          <option value="1">Test 1</option>
+          <option value="2">Test 2</option>
+          <option value="3">Test 3</option>
+        </select>
+      </div>
+      <div>
+        <label>Date</label>
+        <input id="s_date" type="date">
+      </div>
+      <div>
+        <label>Libellé (optionnel — ex. "Groupe A", nom de l'éducateur)</label>
+        <input id="s_label" type="text" placeholder="Ex. Groupe A">
+      </div>
+    </div>
+    <button class="btn-primary" onclick="createSession()">Démarrer cette session</button>
+    <p class="hint">Chaque session regroupe un groupe, un numéro de test et une date. Les résultats saisis ci-dessous sont automatiquement rattachés à la session active.</p>
+  </div>
+
+  <!-- SAISIE -->
+  <div class="card">
+    <h2>Nouvelle saisie</h2>
+    <div id="noSessionMsg" class="empty" style="display:none;">Démarre ou sélectionne une session ci-dessus avant de saisir un résultat.</div>
+    <div id="entryForm">
+      <div class="grid">
+        <div>
+          <label>Nom du joueur</label>
+          <input id="nom" type="text" placeholder="Ex. Lucas Martin">
+        </div>
+        <div>
+          <label>Jonglerie — nb en 30s</label>
+          <input id="jonglerie" type="number" min="0" placeholder="Ex. 24">
+        </div>
+        <div>
+          <label>Conduite de balle — temps (s)</label>
+          <input id="conduite" type="number" min="0" step="0.01" placeholder="Ex. 12.4">
+        </div>
+      </div>
+      <button class="btn-primary" onclick="addRow()">Ajouter le résultat</button>
+    </div>
+  </div>
+
+  <!-- RESULTATS -->
+  <div class="card">
+    <div class="toolbar">
+      <h2 style="margin:0;">Résultats <span class="count" id="count"></span></h2>
+    </div>
+    <div class="tabs">
+      <button class="tab-btn active" id="tabCurrent" onclick="setViewMode('current')">Session actuelle</button>
+      <button class="tab-btn" id="tabAll" onclick="setViewMode('all')">Toutes les sessions</button>
+    </div>
+    <div class="table-scroll">
+      <table id="resultsTable">
+        <thead id="tableHead"></thead>
+        <tbody id="tbody"></tbody>
+      </table>
+    </div>
+    <div class="empty" id="emptyMsg">Aucun résultat pour le moment.</div>
+    <hr class="divider">
+    <div class="row-buttons">
+      <button class="btn-secondary" onclick="exportExcel()">📊 Exporter en Excel</button>
+      <button class="btn-ghost" onclick="clearCurrent()">Effacer cette session</button>
+      <button class="btn-ghost" onclick="clearAll()">Tout effacer</button>
+    </div>
+  </div>
+
+  <!-- PARTAGE -->
+  <div class="card">
+    <h2>Envoyer à un autre éducateur</h2>
+    <p class="hint" style="margin-top:0;">Si tu es absent le jour du test : partage la session (vide) avant le test pour que ton collègue sache quoi tester, ou envoie-lui simplement ce fichier HTML. Après le test, il peut te renvoyer la session avec les résultats, que tu réimportes ci-dessous pour fusionner avec les tiennes.</p>
+    <div class="row-buttons">
+      <button class="btn-secondary" onclick="openShare('config')">📤 Partager la session (sans résultats)</button>
+      <button class="btn-secondary" onclick="openShare('results')">📤 Partager la session + résultats</button>
+      <button class="btn-secondary" onclick="openShare('backup')">📤 Tout exporter (sauvegarde complète)</button>
+    </div>
+    <div id="sharePanel" class="share-panel">
+      <label style="margin-top:12px;">Données à envoyer (copier-coller, ou télécharger le fichier)</label>
+      <textarea id="shareText" readonly></textarea>
+      <div class="row-buttons" style="margin-top:8px;">
+        <button class="btn-ghost" onclick="copyShare()">📋 Copier</button>
+        <button class="btn-ghost" onclick="downloadShare()">⬇️ Télécharger le .json</button>
+        <button class="btn-ghost" id="nativeShareBtn" onclick="nativeShare()" style="display:none;">📲 Partager...</button>
+        <span class="copy-msg" id="copyMsg"></span>
+      </div>
+    </div>
+
+    <hr class="divider">
+    <h3>Importer une session reçue</h3>
+    <textarea id="importText" placeholder="Colle ici le contenu JSON reçu d'un collègue..."></textarea>
+    <div class="row-buttons" style="margin-top:8px;">
+      <button class="btn-secondary" onclick="importFromText()">Importer depuis le texte</button>
+      <label class="btn-ghost" style="display:inline-flex; align-items:center; cursor:pointer;">
+        📁 Importer un fichier .json
+        <input type="file" id="importFile" accept="application/json" style="display:none;" onchange="importFromFile(event)">
+      </label>
+    </div>
+  </div>
+</div>
+
+<script>
+  const CATS = ['U8', 'U13', 'Section sportive', 'Autre'];
+  let sessions = [];
+  let results = [];
+  let activeSessionId = null;
+  let viewMode = 'current';
+
+  function loadState() {
+    try { sessions = JSON.parse(localStorage.getItem('fiche-tests-foot-sessions') || '[]'); } catch (e) { sessions = []; }
+    try { results = JSON.parse(localStorage.getItem('fiche-tests-foot-results') || '[]'); } catch (e) { results = []; }
+    activeSessionId = localStorage.getItem('fiche-tests-foot-active') || null;
+    if (activeSessionId && !sessions.find(s => s.id === activeSessionId)) activeSessionId = null;
+  }
+
+  function saveState() {
+    try {
+      localStorage.setItem('fiche-tests-foot-sessions', JSON.stringify(sessions));
+      localStorage.setItem('fiche-tests-foot-results', JSON.stringify(results));
+      if (activeSessionId) localStorage.setItem('fiche-tests-foot-active', activeSessionId);
+      else localStorage.removeItem('fiche-tests-foot-active');
+    } catch (e) { console.warn('Sauvegarde locale impossible', e); }
+  }
+
+  function uid() { return 's' + Date.now() + Math.random().toString(36).slice(2, 7); }
+
+  function sessionLabel(s) {
+    const base = `${s.categorie} — Test ${s.testNum} — ${s.date || '?'}`;
+    return s.label ? `${base} (${s.label})` : base;
+  }
+
+  function getSession(id) { return sessions.find(s => s.id === id); }
+
+  function createSession() {
+    const categorie = document.getElementById('s_categorie').value;
+    const testNum = document.getElementById('s_testNum').value;
+    const date = document.getElementById('s_date').value;
+    const label = document.getElementById('s_label').value.trim();
+    if (!date) { alert('Merci de renseigner une date pour la session.'); return; }
+    const session = { id: uid(), categorie, testNum, date, label };
+    sessions.push(session);
+    activeSessionId = session.id;
+    viewMode = 'current';
+    document.getElementById('s_label').value = '';
+    saveState();
+    renderAll();
+  }
+
+  function switchSession(id) {
+    activeSessionId = id;
+    viewMode = 'current';
+    saveState();
+    renderAll();
+  }
+
+  function setViewMode(mode) {
+    viewMode = mode;
+    document.getElementById('tabCurrent').classList.toggle('active', mode === 'current');
+    document.getElementById('tabAll').classList.toggle('active', mode === 'all');
+    renderResults();
+  }
+
+  function renderBanner() {
+    const el = document.getElementById('activeBanner');
+    const s = activeSessionId ? getSession(activeSessionId) : null;
+    if (!s) {
+      el.innerHTML = `<p class="empty" style="margin:0 0 12px;">Aucune session active — crée-en une ci-dessous, ou choisis-en une existante.</p>`;
+      return;
+    }
+    const n = results.filter(r => r.sessionId === s.id).length;
+    el.innerHTML = `<div class="active-banner">
+      <div class="meta">✅ ${sessionLabel(s)}<small>${n} résultat${n > 1 ? 's' : ''} saisi${n > 1 ? 's' : ''}</small></div>
+    </div>`;
+  }
+
+  function renderChips() {
+    const el = document.getElementById('sessionChips');
+    if (!sessions.length) { el.innerHTML = ''; return; }
+    el.innerHTML = '<label>Sessions existantes</label><div class="chip-list">' +
+      sessions.slice().reverse().map(s =>
+        `<span class="chip ${s.id === activeSessionId ? 'active' : ''}" onclick="switchSession('${s.id}')">${sessionLabel(s)}</span>`
+      ).join('') + '</div>';
+  }
+
+  function renderEntryForm() {
+    const has = !!activeSessionId;
+    document.getElementById('noSessionMsg').style.display = has ? 'none' : 'block';
+    document.getElementById('entryForm').style.display = has ? 'block' : 'none';
+  }
+
+  function renderResults() {
+    const thead = document.getElementById('tableHead');
+    const tbody = document.getElementById('tbody');
+    const empty = document.getElementById('emptyMsg');
+    const count = document.getElementById('count');
+    const showAll = viewMode === 'all';
+
+    let rows = results.map((r, i) => ({ ...r, _idx: i }));
+    if (!showAll) rows = rows.filter(r => r.sessionId === activeSessionId);
+
+    thead.innerHTML = showAll
+      ? `<tr><th>Session</th><th>Nom</th><th>Jonglerie</th><th>Conduite (s)</th><th></th></tr>`
+      : `<tr><th>Nom</th><th>Jonglerie</th><th>Conduite (s)</th><th></th></tr>`;
+
+    count.textContent = rows.length ? `(${rows.length})` : '';
+    empty.style.display = rows.length ? 'none' : 'block';
+    tbody.innerHTML = '';
+    rows.forEach(r => {
+      const s = getSession(r.sessionId);
+      const tr = document.createElement('tr');
+      tr.innerHTML = (showAll ? `<td>${s ? sessionLabel(s) : '—'}</td>` : '') +
+        `<td>${r.nom}</td><td>${r.jonglerie}</td><td>${r.conduite}</td>
+        <td><button class="btn-danger" onclick="removeRow(${r._idx})">✕</button></td>`;
+      tbody.appendChild(tr);
+    });
+  }
+
+  function renderAll() {
+    renderBanner();
+    renderChips();
+    renderEntryForm();
+    renderResults();
+  }
+
+  function addRow() {
+    if (!activeSessionId) { alert('Démarre ou sélectionne une session avant de saisir un résultat.'); return; }
+    const nom = document.getElementById('nom').value.trim();
+    const jonglerie = document.getElementById('jonglerie').value;
+    const conduite = document.getElementById('conduite').value;
+    if (!nom || jonglerie === '' || conduite === '') {
+      alert('Merci de renseigner au moins le nom, la jonglerie et la conduite de balle.');
+      return;
+    }
+    results.push({ sessionId: activeSessionId, nom, jonglerie, conduite });
+    saveState();
+    renderAll();
+    document.getElementById('nom').value = '';
+    document.getElementById('jonglerie').value = '';
+    document.getElementById('conduite').value = '';
+    document.getElementById('nom').focus();
+  }
+
+  function removeRow(i) {
+    results.splice(i, 1);
+    saveState();
+    renderAll();
+  }
+
+  function clearCurrent() {
+    if (!activeSessionId) return;
+    const n = results.filter(r => r.sessionId === activeSessionId).length;
+    if (n && !confirm('Effacer les résultats de cette session ?')) return;
+    results = results.filter(r => r.sessionId !== activeSessionId);
+    saveState();
+    renderAll();
+  }
+
+  function clearAll() {
+    if ((results.length || sessions.length) && !confirm('Effacer toutes les sessions et tous les résultats ?')) return;
+    results = [];
+    sessions = [];
+    activeSessionId = null;
+    saveState();
+    renderAll();
+  }
+
+  function safeSheetName(base, used) {
+    let name = base.replace(/[\\\/\?\*\[\]:]/g, '-').slice(0, 31);
+    let candidate = name;
+    let i = 2;
+    while (used.has(candidate)) {
+      const suffix = ` (${i})`;
+      candidate = name.slice(0, 31 - suffix.length) + suffix;
+      i++;
+    }
+    used.add(candidate);
+    return candidate;
+  }
+
+  function exportExcel() {
+    if (!results.length) { alert('Aucun résultat à exporter.'); return; }
+    if (typeof XLSX === 'undefined') {
+      alert('L’export Excel nécessite une connexion Internet au premier chargement. Recharge la page avec Internet puis réessaie.');
+      return;
+    }
+    const wb = XLSX.utils.book_new();
+    const usedNames = new Set();
+
+    // Feuille "Tout" : tous les résultats, toutes sessions confondues
+    const all = results.map(r => {
+      const s = getSession(r.sessionId) || {};
+      return {
+        'Session': s.id ? sessionLabel(s) : '—',
+        'Catégorie': s.categorie || '',
+        'Test': s.testNum ? `Test ${s.testNum}` : '',
+        'Date': s.date || '',
+        'Nom': r.nom,
+        'Jonglerie (nb/30s)': r.jonglerie,
+        'Conduite de balle (s)': r.conduite
+      };
+    });
+    const wsAll = XLSX.utils.json_to_sheet(all);
+    wsAll['!cols'] = [{ wch: 30 }, { wch: 16 }, { wch: 8 }, { wch: 12 }, { wch: 20 }, { wch: 18 }, { wch: 18 }];
+    XLSX.utils.book_append_sheet(wb, wsAll, safeSheetName('Tout', usedNames));
+
+    // Une feuille par session : Nom / Jonglerie / Conduite
+    // -> à coller directement sous le bon bloc "TEST n" de l'onglet
+    // "Fiche Test" du groupe concerné (colonnes B-D, E-G ou H-J selon le test).
+    sessions.forEach(s => {
+      const rows = results.filter(r => r.sessionId === s.id).map(r => ({
+        'Nom': r.nom,
+        'Date': s.date,
+        'Jonglerie (nb/30s)': r.jonglerie,
+        'Conduite de balle (s)': r.conduite
+      }));
+      if (rows.length) {
+        const wsT = XLSX.utils.json_to_sheet(rows);
+        wsT['!cols'] = [{ wch: 20 }, { wch: 12 }, { wch: 18 }, { wch: 18 }];
+        const name = safeSheetName(`${s.categorie} T${s.testNum} ${s.date}${s.label ? ' ' + s.label : ''}`, usedNames);
+        XLSX.utils.book_append_sheet(wb, wsT, name);
+      }
+    });
+
+    const today = new Date().toISOString().slice(0, 10);
+    XLSX.writeFile(wb, `fiche-tests-foot-${today}.xlsx`);
+  }
+
+  // ---- Partage / import ----
+  let shareMode = null;
+
+  function openShare(mode) {
+    shareMode = mode;
+    const panel = document.getElementById('sharePanel');
+    const s = activeSessionId ? getSession(activeSessionId) : null;
+    if (mode !== 'backup' && !s) { alert('Sélectionne ou démarre une session à partager.'); return; }
+
+    let payload;
+    if (mode === 'config') {
+      payload = { kind: 'fiche-test-session', session: s };
+    } else if (mode === 'results') {
+      payload = { kind: 'fiche-test-session-results', session: s, results: results.filter(r => r.sessionId === s.id) };
+    } else {
+      payload = { kind: 'fiche-test-backup', sessions, results };
+    }
+    const text = JSON.stringify(payload, null, 2);
+    document.getElementById('shareText').value = text;
+    document.getElementById('copyMsg').textContent = '';
+    panel.classList.add('open');
+    document.getElementById('nativeShareBtn').style.display = navigator.share ? 'inline-block' : 'none';
+    panel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  }
+
+  function copyShare() {
+    const ta = document.getElementById('shareText');
+    ta.select();
+    try {
+      navigator.clipboard.writeText(ta.value);
+      document.getElementById('copyMsg').textContent = 'Copié ✓';
+    } catch (e) {
+      document.execCommand('copy');
+      document.getElementById('copyMsg').textContent = 'Copié ✓';
+    }
+  }
+
+  function downloadShare() {
+    const text = document.getElementById('shareText').value;
+    const blob = new Blob([text], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    const today = new Date().toISOString().slice(0, 10);
+    a.href = url;
+    a.download = `session-fiche-test-${shareMode}-${today}.json`;
+    a.click();
+    URL.revokeObjectURL(url);
+  }
+
+  function nativeShare() {
+    const text = document.getElementById('shareText').value;
+    if (navigator.share) {
+      navigator.share({ title: 'Fiche de tests - session', text }).catch(() => {});
+    }
+  }
+
+  function mergeImportedSessions(list) {
+    (list || []).forEach(s => {
+      if (s && s.id && !sessions.find(x => x.id === s.id)) sessions.push(s);
+    });
+  }
+
+  function mergeImportedResults(list) {
+    (list || []).forEach(r => {
+      if (!r) return;
+      const exists = results.some(x => x.sessionId === r.sessionId && x.nom === r.nom &&
+        String(x.jonglerie) === String(r.jonglerie) && String(x.conduite) === String(r.conduite));
+      if (!exists) results.push(r);
+    });
+  }
+
+  function applyImport(data) {
+    if (!data || !data.kind) { alert('Fichier non reconnu.'); return; }
+    if (data.kind === 'fiche-test-session') {
+      mergeImportedSessions([data.session]);
+      activeSessionId = data.session.id;
+    } else if (data.kind === 'fiche-test-session-results') {
+      mergeImportedSessions([data.session]);
+      mergeImportedResults(data.results);
+      activeSessionId = data.session.id;
+    } else if (data.kind === 'fiche-test-backup') {
+      mergeImportedSessions(data.sessions);
+      mergeImportedResults(data.results);
+    } else {
+      alert('Fichier non reconnu.');
+      return;
+    }
+    viewMode = 'current';
+    saveState();
+    renderAll();
+    alert('Import réussi.');
+  }
+
+  function importFromText() {
+    const raw = document.getElementById('importText').value.trim();
+    if (!raw) { alert('Colle d\'abord le texte reçu.'); return; }
+    try { applyImport(JSON.parse(raw)); }
+    catch (e) { alert('JSON invalide.'); }
+  }
+
+  function importFromFile(evt) {
+    const file = evt.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = () => {
+      try { applyImport(JSON.parse(reader.result)); }
+      catch (e) { alert('Fichier JSON invalide.'); }
+    };
+    reader.readAsText(file);
+    evt.target.value = '';
+  }
+
+  // ---- init ----
+  loadState();
+  document.getElementById('s_date').valueAsDate = new Date();
+  renderAll();
+</script>
+</body>
+</html>
